@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=yes"
+    />
+    <title>Mohit Sain OMR Checker</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="app">
+      <nav class="topnav">
+        <div class="nav-logo">
+          <div class="logo-icon">⚡</div>
+          <div>
+            <span class="logo-text">Mohit</span
+            ><span class="logo-badge">Sain</span>
+          </div>
+        </div>
+        <div class="nav-stats">
+          <div class="nav-stat">
+            <span class="nav-stat-val" id="nav-answered">0</span
+            ><span class="nav-stat-label">Answered</span>
+          </div>
+          <div class="nav-stat">
+            <span class="nav-stat-val" style="color: var(--text-muted)"
+              >100</span
+            ><span class="nav-stat-label">Total</span>
+          </div>
+        </div>
+      </nav>
+      <div class="container">
+        <div class="hero">
+          <div class="hero-eyebrow">Live Exam · Locked Answers</div>
+          <h1 class="hero-title">
+            Advanced <span class="grad">OMR Sheet</span><br />Non‑editable after
+            selection
+          </h1>
+          <p class="hero-sub">
+            Once you pick an answer, it's locked. 100 questions · 5 options.
+          </p>
+        </div>
+        <div class="progress-card">
+          <div class="progress-info">
+            <span class="progress-label">Progress</span
+            ><span class="progress-value" id="progressVal">0/100</span>
+          </div>
+          <div class="progress-track-wrap">
+            <div class="progress-track">
+              <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-pct" id="progressPct">0% completed</div>
+          </div>
+        </div>
+        <div class="toolbar">
+          <button class="btn btn-ghost" id="resetBtn" onclick="resetOMR()">
+            ⟳ Reset</button
+          ><button class="btn btn-demo" id="demoBtn" onclick="autoFillDemo()">
+            ⚡ Auto Fill Demo</button
+          ><button class="btn btn-primary" id="submitBtn" onclick="submitOMR()">
+            📄 Submit OMR
+          </button>
+        </div>
+
+        <div class="omr-card">
+          <div class="omr-card-header">
+            <div class="omr-card-title">
+              <span class="dot"></span>Answer Sheet — final responses
+            </div>
+            <div class="omr-card-meta">
+              <span class="meta-chip">A B C D E</span
+              ><span class="meta-chip">1 mark each</span>
+            </div>
+          </div>
+          <div class="question-grid" id="questionGrid"></div>
+          <div class="omr-card-footer">
+            <span
+              >◉ Once a bubble is filled, answer is permanent (until
+              reset).</span
+            >
+          </div>
+        </div>
+
+        <div class="ak-section" id="akSection">
+          <div class="ak-card">
+            <div class="ak-header">
+              <div class="ak-title">Answer Key (evaluation)</div>
+              <div class="ak-desc">
+                Paste 100 answers (A-E or 1-5). Invalid chars marked yellow.
+              </div>
+              <div>
+                <button
+                  class="btn btn-demo"
+                  style="margin-top: 10px"
+                  onclick="autoFillAnswerKey()"
+                >
+                  ✨ Demo Answer Key
+                </button>
+              </div>
+            </div>
+            <div class="ak-body">
+              <textarea
+                id="akTextarea"
+                class="ak-textarea"
+                placeholder="Example: abcdeabcde... or 1 2 3 4 5..."
+                oninput="onAKInput()"
+              ></textarea>
+              <div id="akParsePreview" class="ak-parse-preview">
+                <div class="ak-parse-label">parsed answers preview</div>
+                <div id="akParseChips"></div>
+              </div>
+            </div>
+            <div class="ak-footer">
+              <span id="akValidInfo">Waiting for key</span
+              ><button class="btn btn-success" onclick="evaluateAnswers()">
+                📊 Evaluate & Report
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="results-section" id="resultsSection">
+          <div class="results-card">
+            <div class="results-banner">
+              <div>
+                <div class="results-banner-eyebrow">✅ Evaluation</div>
+                <div class="results-score-display">
+                  <span class="results-score-num" id="rScoreNum">0</span
+                  ><span style="font-size: 24px">/100</span>
+                </div>
+                <div id="rGradeBadge" class="results-grade-badge">—</div>
+              </div>
+              <div>
+                <div class="circular-progress-wrap">
+                  <svg width="100" height="100">
+                    <circle
+                      cx="50"
+                      cy="50"
+                      r="45"
+                      fill="none"
+                      stroke="rgba(255,255,255,0.08)"
+                      stroke-width="8"
+                    />
+                    <circle
+                      id="circularFill"
+                      cx="50"
+                      cy="50"
+                      r="45"
+                      fill="none"
+                      stroke-width="8"
+                      stroke-linecap="round"
+                      stroke-dasharray="283"
+                      stroke-dashoffset="283"
+                    />
+                  </svg>
+                  <div class="circular-text">
+                    <span class="circular-pct" id="rPctCircle">0%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="stats-grid">
+              <div class="stat-cell">
+                <div class="stat-num c-cyan" id="rTotal">100</div>
+                <div class="stat-lbl">Total</div>
+              </div>
+              <div class="stat-cell">
+                <div class="stat-num c-white" id="rAttempted">0</div>
+                <div class="stat-lbl">Attempted</div>
+              </div>
+              <div class="stat-cell">
+                <div class="stat-num c-green" id="rCorrect">0</div>
+                <div class="stat-lbl">Correct</div>
+              </div>
+              <div class="stat-cell">
+                <div class="stat-num c-red" id="rWrong">0</div>
+                <div class="stat-lbl">Wrong</div>
+              </div>
+              <div class="stat-cell">
+                <div class="stat-num c-gray" id="rUnattempted">0</div>
+                <div class="stat-lbl">Unattempted</div>
+              </div>
+              <div class="stat-cell">
+                <div class="stat-num c-yellow" id="rInvalid">0</div>
+                <div class="stat-lbl">Invalid key</div>
+              </div>
+            </div>
+            <div class="detail-block" style="padding: 18px">
+              <div style="display: flex; gap: 20px; flex-wrap: wrap">
+                <div>
+                  <strong>❌ Wrong questions</strong>
+                  <div id="wrongTagList" class="tag-list"></div>
+                </div>
+                <div>
+                  <strong>⚪ Unattempted</strong>
+                  <div id="unattemptedTagList"></div>
+                </div>
+                <div>
+                  <strong>⚠️ Invalid keys</strong>
+                  <div id="invalidTagList"></div>
+                </div>
+              </div>
+              <div class="wrong-table-wrap" style="margin-top: 24px">
+                <table class="wrong-table">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Ques</th>
+                      <th>Your Answer</th>
+                      <th>Correct</th>
+                    </tr>
+                  </thead>
+                  <tbody id="wrongTableBody"></tbody>
+                </table>
+              </div>
+            </div>
+            <div class="results-actions">
+              <button class="btn btn-danger" onclick="resetOMR()">
+                ⟲ Start Over
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="fab-bar">
+        <span class="fab-bar-stat"
+          >📌 Answered: <span id="fabAnswered">0</span>/100</span
+        ><button
+          class="btn btn-ghost"
+          style="padding: 6px 12px"
+          onclick="scrollToTop()"
+        >
+          ↑ Top</button
+        ><button
+          class="btn btn-primary"
+          style="padding: 6px 16px"
+          onclick="submitOMR()"
+        >
+          Submit →
+        </button>
+      </div>
+      <div id="evaluatingOverlay" class="evaluating-overlay">
+        <div class="evaluating-box">
+          <div class="eval-spinner"></div>
+          <div class="eval-title">Computing results...</div>
+          <div class="eval-sub" id="evalProgress"></div>
+        </div>
+      </div>
+      <div id="toastContainer" class="toast-container"></div>
+    </div>
+
+    <!-- custom confirmation modal -->
+    <div id="confirmationModal" class="modal-confirm">
+      <div class="modal-card">
+        <div class="modal-icon">⚠️</div>
+        <div class="modal-title">Confirm Action</div>
+        <div class="modal-message" id="confirmMessage"></div>
+        <div class="modal-buttons">
+          <button class="modal-btn cancel" id="modalCancelBtn">Cancel</button>
+          <button class="modal-btn confirm" id="modalConfirmBtn">
+            Proceed
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
